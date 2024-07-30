@@ -17,7 +17,7 @@ from astro.sql.table import Table, Metadata
 # default args & init dag
 CWD = pathlib.Path(__file__).parent
 default_args = {
-    "owner": "luan moreno m. maciel",
+    "owner": "claudio souza",
     "retries": 1,
     "retry_delay": 0
 }
@@ -25,8 +25,8 @@ default_args = {
 
 # declare dag
 @dag(
-    dag_id="local-development-etl-workshop",
-    start_date=datetime(2023, 4, 14),
+    dag_id="dag-etl-local-user-subscription",
+    start_date=datetime(2024, 7, 29),
     max_active_runs=1,
     schedule_interval=timedelta(hours=24),
     default_args=default_args,
