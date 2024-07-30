@@ -43,3 +43,29 @@ def load_files_warehouse():
     # init & finish
     init = EmptyOperator(task_id="init")
     finish = EmptyOperator(task_id="finish")
+
+    # ingest from lake to snowflake
+    users_json_files_snowflake = aql.load_file(
+        task_id="users_json_files_snowflake",
+        input_file=File(path="gs://owshq-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
+        output_table=Table(name="users", conn_id=SNOWFLAKE_CONN_ID),
+        if_exists="replace",
+        use_native_support=True,
+        columns_names_capitalization="original"
+    )
+
+    # ingest from lake to bigquery
+    users_json_files_bigquery = aql.load_file(
+        task_id="users_json_files_bigquery",
+        input_file=File(path="gs://owshq-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
+        output_table=Table(name="users", metadata=Metadata(schema="OwsHQ"), conn_id=BIGQUERY_CONN_ID),
+        if_exists="replace",
+        use_native_support=True,
+        columns_names_capitalization="original"
+    )
+
+    # define sequence
+    init >> [users_json_files_snowflake, users_json_files_bigquery] >> finish
+
+# init
+dag = load_files_warehouse()
