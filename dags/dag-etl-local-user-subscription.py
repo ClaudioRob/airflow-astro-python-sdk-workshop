@@ -14,6 +14,9 @@ from astro.files import File
 from astro.constants import FileType
 from astro.sql.table import Table, Metadata
 
+# connections & variables
+# ASTRO_POSTGRESS_CONN_ID = "postgres_conn"
+
 # default args & init dag
 CWD = pathlib.Path(__file__).parent
 default_args = {
@@ -21,7 +24,6 @@ default_args = {
     "retries": 1,
     "retry_delay": 0
 }
-
 
 # declare dag
 @dag(
@@ -44,12 +46,16 @@ def dataframe_etl():
     user_file = aql.load_file(
         task_id="user_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/user/user*", filetype=FileType.JSON),
+        output_table=Table(conn_id="postgres_conn"),
+        if_exists="replace",
     )
 
     # load files {subscription}
     subscription_file = aql.load_file(
         task_id="subscription_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/subscription/subscription*", filetype=FileType.JSON),
+        output_table=Table(conn_id="postgres_conn"),
+        if_exists="replace",
     )
 
     # define sequence
