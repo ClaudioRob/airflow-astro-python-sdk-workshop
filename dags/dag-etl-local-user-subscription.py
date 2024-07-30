@@ -38,6 +38,8 @@ default_args = {
 # init main function
 def dataframe_etl():
 
+    schema = "astrosdk"
+
     # init & finish task
     init_data_load = EmptyOperator(task_id="init")
     finish_data_load = EmptyOperator(task_id="finish")
@@ -46,7 +48,7 @@ def dataframe_etl():
     user_file = aql.load_file(
         task_id="user_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/user/user*", filetype=FileType.JSON),
-        output_table=Table(conn_id="postgres_conn"),
+        output_table=Table(metadata=Metadata(schema=schema), name="user", conn_id="postgres_conn"),
         if_exists="replace",
     )
 
@@ -54,7 +56,7 @@ def dataframe_etl():
     subscription_file = aql.load_file(
         task_id="subscription_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/subscription/subscription*", filetype=FileType.JSON),
-        output_table=Table(conn_id="postgres_conn"),
+        output_table=Table(metadata=Metadata(schema=schema), name="subscription", conn_id="postgres_conn"),
         if_exists="replace",
     )
 
