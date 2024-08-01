@@ -15,7 +15,7 @@ from astro.constants import FileType
 from astro.sql.table import Table, Metadata
 
 # connections & variables
-ASTRO_POSTGRESS_CONN_ID = "postgres_conn"
+POSTGRESS_CONN_ID = "postgres_conn"
 
 # default args & init dag
 CWD = pathlib.Path(__file__).parent
@@ -38,8 +38,6 @@ default_args = {
 # init main function
 def dataframe_etl():
 
-    # schema = "astrosdk"
-
     # init & finish task
     init_data_load = EmptyOperator(task_id="init")
     finish_data_load = EmptyOperator(task_id="finish")
@@ -48,7 +46,7 @@ def dataframe_etl():
     user_file = aql.load_file(
         task_id="user_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/user/user*", filetype=FileType.JSON),
-        output_table=Table(name="user", conn_id=ASTRO_POSTGRESS_CONN_ID, metadata=Metadata(schema="astrosdk"),),
+        output_table=Table(name="user", conn_id=POSTGRESS_CONN_ID, metadata=Metadata(schema="astro"),),
         # output_table=Table(metadata=Metadata(schema=schema), name="user", conn_id="postgres_conn"),
         if_exists="replace",
         use_native_support=True,
@@ -59,7 +57,7 @@ def dataframe_etl():
     subscription_file = aql.load_file(
         task_id="subscription_file",
         input_file=File(path=str(CWD.parent) + "/dags/data/subscription/subscription*", filetype=FileType.JSON),
-        output_table=Table(name="subscription", conn_id=ASTRO_POSTGRESS_CONN_ID, metadata=Metadata(schema="astrosdk"),),
+        output_table=Table(name="subscription", conn_id=POSTGRESS_CONN_ID, metadata=Metadata(schema="astro"),),
         if_exists="replace",
         use_native_support=True,
         columns_names_capitalization="original"

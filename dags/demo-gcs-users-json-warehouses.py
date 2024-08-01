@@ -17,6 +17,7 @@ from astro.sql.table import Table, Metadata
 SOURCE_CONN_ID = "google_cloud_default"
 SNOWFLAKE_CONN_ID = "snowflake_default"
 BIGQUERY_CONN_ID = "google_cloud_default"
+POSTGRESS_CONN_ID = "postgres_conn"
 
 # default args
 default_args = {
