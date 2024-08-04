@@ -1,6 +1,3 @@
-"""
-"""
-
 # import libraries
 import os
 from datetime import date, datetime, timedelta
@@ -25,11 +22,10 @@ OUTPUT_CONN_ID = "postgres_conn"
 
 # default args & init dag
 default_args = {
-    "owner": "luan moreno m. maciel",
+    "owner": "claudio Souza",
     "retries": 1,
     "retry_delay": 0
 }
-
 
 # START_transforms {sql}
 @aql.transform
@@ -82,7 +78,6 @@ def join_tables(user: Table, subscription: Table):
     """
 # END_transforms {sql}
 
-
 # START_dataframes {pandas}
 @aql.dataframe()
 def plan_importance(subscription: pd.DataFrame):
@@ -93,13 +88,13 @@ def plan_importance(subscription: pd.DataFrame):
 
 # declare dag
 @dag(
-    dag_id="dag-etl-subscriptions-analysis",
+    dag_id="dag_etl_s3_postgres",
     start_date=datetime(2023, 4, 14),
     max_active_runs=1,
     schedule_interval=timedelta(hours=24),
     default_args=default_args,
     catchup=False,
-    tags=['development', 'elt', 'astrosdk']
+    tags=['dev', 'elt', 'astrosdk']
 )
 # init main function
 def etl_subscriptions_analysis():

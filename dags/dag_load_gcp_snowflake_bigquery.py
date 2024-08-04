@@ -28,14 +28,14 @@ default_args = {
 
 # declare dag
 @dag(
-    dag_id="demo-gcs-users-json-warehouses",
+    dag_id="dag_load_gcp_snowflake_bigquery",
     start_date=datetime(2023, 4, 15),       # data inicial da execução
     schedule_interval=timedelta(hours=24),  # intervalo de execução
     max_active_runs=1,                      # evitar nova execuçao caso esteja ativa
     catchup=False,                          # evitar que sejam reprocessados arquivos antigos
     default_args=default_args,
     # owner_links={"linkedin": "https://www.linkedin.com/in/luanmoreno/"},
-    tags=['gcs', 'json', 'users', 'astrosdk', 'snowflake', 'bigquery']
+    tags=['astrosdk', 'snowflake', 'bigquery']
 )
 
 # declare main function

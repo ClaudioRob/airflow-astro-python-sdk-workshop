@@ -27,13 +27,13 @@ default_args = {
 
 # declare dag
 @dag(
-    dag_id="dag-etl-local-user-subscription",
+    dag_id="dag_load_local_postgres",
     start_date=datetime(2024, 7, 29),
     max_active_runs=1,
     schedule_interval=timedelta(hours=24),
     default_args=default_args,
     catchup=False,
-    tags=['development', 'elt', 'astrosdk']
+    tags=['postgres', 'elt', 'astrosdk']
 )
 # init main function
 def dataframe_etl():
