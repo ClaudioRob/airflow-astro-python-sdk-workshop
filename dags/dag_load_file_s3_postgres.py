@@ -4,20 +4,25 @@ Tasks
 """
 
 # import libraries
-import os
-import pathlib
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.utils.dates import days_ago
 from datetime import date, datetime, timedelta
-
 from airflow.decorators import dag, task
-from airflow.operators.empty import EmptyOperator
-
 import pandas as pd
-from pandas import DataFrame
 
+
+from airflow.operators.empty import EmptyOperator
+from pandas import DataFrame
 from astro import sql as aql
 from astro.files import File
 from astro.constants import FileType
 from astro.sql.table import Table, Metadata
+
+# from minio import Minio
+# from minio.error import S3Error
 
 # connections
 MINIO_CONN_ID = "minio_conn"
@@ -31,7 +36,7 @@ default_args = {
 }
 
 @dag(
-    dag_id='dag_load_file_minio_s3',
+    dag_id='dag_load_file_s3_postgres',
     start_date=datetime(2022, 2, 12),
     schedule_interval='@daily',
     max_active_runs=1,
