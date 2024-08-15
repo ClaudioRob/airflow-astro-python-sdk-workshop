@@ -1,33 +1,37 @@
-from airflow.decorators import dag
 from astro import sql as aql
 from astro.files import File
 from astro.table import Table
+from airflow.decorators import dag
 from datetime import datetime
+import os
 
-# Define o DAG usando o decorator do Airflow
+# Definição da DAG usando o Astro SDK
 @dag(
-    'minio_to_postgres',
-     schedule_interval=None,
-     start_date=datetime(2024, 1, 1),
-     catchup=False,
+    schedule_interval="@daily",
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=["transfer", "minio", "postgres"],
 )
-
-def minio_to_postgres_pipeline():
+def transfer_csv_dag_to_postgres():
     
-    # Define a tarefa para carregar dados do MinIO
-    @aql.transform
-    def load_data():
-        return """
-        SELECT *
-        FROM {{input}}
-        """
+    # Definindo a origem do arquivo no MinIO (S3)
+    minio_file = File(
+        path="s3://airflow/resultados3km.csv",
+        conn_id="aws_default"  # Este é o ID da conexão S3 configurado no Airflow
+    )
+    
+    # Definindo a tabela de destino no PostgreSQL
+    postgres_table = Table(
+        name="resultados",
+        conn_id="postgres_conn",  # Este é o ID da conexão PostgreSQL configurado no Airflow
+        schema="corridas"
+    )
+    
+    # Usando a função de transformação do Astro SDK para carregar o CSV no PostgreSQL
+    aql.load_file(
+        input_file=minio_file,
+        output_table=postgres_table,
+        if_exists="replace"  # Substitui a tabela se já existir
+    )
 
-    # Especifica o arquivo de entrada no MinIO e a tabela de saída no PostgreSQL
-    input_file = File("s3://airflow/resultados3km.csv", conn_id='minio_default')
-    output_table = Table(name='vemcuidardemim', schema='corridas', conn_id='postgres_default')
-
-    # Define a tarefa para transferir os dados
-    load_data(input=input_file, output=output_table)
-
-# Instancia o DAG
-dag_instance = minio_to_postgres_pipeline()
+dag = transfer_csv_dag_to_postgres()
