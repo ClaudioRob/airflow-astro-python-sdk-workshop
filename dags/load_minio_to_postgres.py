@@ -6,8 +6,8 @@ from astro.table import Table
 from astro.sql.table import Table, Metadata
 
 # Substitua pelos seus IDs de conexão
-ASTRO_S3_CONN_ID = 'aws_default'
-ASTRO_POSTGRES_CONN_ID = 'postgres_conn'
+S3_CONN_ID = 'aws_default'
+POSTGRES_CONN_ID = 'postgres_conn'
 
 # Defina a DAG
 with DAG(
@@ -20,8 +20,8 @@ with DAG(
     # Tarefa para carregar o arquivo do MinIO para o Postgres
     new_table = aql.load_file(
         task_id="s3_to_postgres_replace",
-        input_file=File(path="s3://airflow/olist_public_dataset.csv", conn_id=ASTRO_S3_CONN_ID),
-        output_table=Table(name='resultados', metadata=Metadata(schema="corridas"), conn_id=ASTRO_POSTGRES_CONN_ID),
+        input_file=File(path="s3://airflow/olist_public_dataset.csv", conn_id=S3_CONN_ID),
+        output_table=Table(name='resultados', metadata=Metadata(schema="corridas"), conn_id=POSTGRES_CONN_ID),
         if_exists="replace",
         # is_increental=True,
         use_native_support=True,

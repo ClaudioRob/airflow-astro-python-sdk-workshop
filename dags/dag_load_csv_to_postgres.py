@@ -1,18 +1,17 @@
+
+from airflow.operators.python import PythonOperator
+from airflow.decorators import dag
+from datetime import datetime
 from astro import sql as aql
 from astro.files import File
 from astro.table import Table
-from airflow.decorators import dag
-from datetime import datetime
 import os
 
-# Definição da DAG usando o Astro SDK
-@dag(
-    schedule_interval="@daily",
-    start_date=datetime(2023, 1, 1),
-    catchup=False,
-    tags=["transfer", "minio", "postgres"],
-)
-def transfer_csv_dag_to_postgres():
+# Substitua pelos seus IDs de conexão
+ASTRO_S3_CONN_ID = 'aws_default'
+ASTRO_POSTGRES_CONN_ID = 'postgres_conn'
+
+def load_csv_to_postgres():
     
     # Definindo a origem do arquivo no MinIO (S3)
     minio_file = File(
@@ -34,4 +33,17 @@ def transfer_csv_dag_to_postgres():
         if_exists="replace"  # Substitui a tabela se já existir
     )
 
-dag = transfer_csv_dag_to_postgres()
+# Definição da DAG usando o Astro SDK
+@dag(
+    schedule_interval="@daily",
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=["transfer", "minio", "postgres"],
+)
+def dag_load_csv_to_postgres():
+    transfer_task = PythonOperator(
+        task_id="load_csv_to_postgres",
+        python_callable=load_csv_to_postgres,
+    )
+
+dag = dag_load_csv_to_postgres()

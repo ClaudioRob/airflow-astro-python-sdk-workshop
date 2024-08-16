@@ -1,9 +1,11 @@
 from airflow.decorators import dag
 from airflow.operators.python import PythonOperator
 from datetime import datetime
+from sqlalchemy import create_engine
+import os
 import boto3
 import pandas as pd
-from sqlalchemy import create_engine
+
 
 # Configurações das conexões
 MINIO_CONN_ID = "aws_default"
