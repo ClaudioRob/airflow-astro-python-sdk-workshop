@@ -18,12 +18,7 @@ SCHEMA_NAME = "corridas"
 # Função para baixar o CSV do MinIO e carregar no PostgreSQL
 def transfer_csv_to_postgres():
     # Conectar ao MinIO usando boto3
-    s3_client = boto3.client(
-        "s3",
-        endpoint_url="http://Minio:9000",
-        aws_access_key_id="LtTnhoirCZie2UTICHGj",
-        aws_secret_access_key="oGvKii91jipCrk4cXQx3SzIoulUBabOc26Az5P7S",
-    )
+    s3_client = boto3.client("s3")
 
     # Baixar o arquivo CSV
     csv_obj = s3_client.get_object(Bucket=BUCKET_NAME, Key=CSV_FILE_NAME)
