@@ -28,14 +28,14 @@ default_args = {
 
 # declare dag
 @dag(
-    dag_id="dag_load_gcp_snowflake_bigquery",
-    start_date=datetime(2023, 4, 15),       # data inicial da execução
+    dag_id="dag_load_gcp_bigquery",
+    start_date=datetime(2024, 8, 20),       # data inicial da execução
     schedule_interval=timedelta(hours=24),  # intervalo de execução
     max_active_runs=1,                      # evitar nova execuçao caso esteja ativa
     catchup=False,                          # evitar que sejam reprocessados arquivos antigos
     default_args=default_args,
     # owner_links={"linkedin": "https://www.linkedin.com/in/luanmoreno/"},
-    tags=['astrosdk', 'snowflake', 'bigquery']
+    tags=['astrosdk', 'gcp', 'bigquery']
 )
 
 # declare main function
@@ -46,11 +46,12 @@ def load_files_warehouse():
     finish = EmptyOperator(task_id="finish")
 
     # ingest from lake to snowflake
-    users_json_files_snowflake = aql.load_file(
-        task_id="users_json_files_snowflake",
-        input_file=File(path="gs://owshq-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
-        output_table=Table(name="users", conn_id=SNOWFLAKE_CONN_ID),
+    users_json_files_postgres = aql.load_file(
+        task_id="users_json_files_postgres",
+        input_file=File(path="gs://crs-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
+        output_table=Table(name="users", metadata=Metadata(schema="CrsHQ"), conn_id=POSTGRESS_CONN_ID),
         if_exists="replace",
+        # is_incremental=True,                # seleciona somente os novos arquivos
         use_native_support=True,
         columns_names_capitalization="original"
     )
@@ -58,15 +59,15 @@ def load_files_warehouse():
     # ingest from lake to bigquery
     users_json_files_bigquery = aql.load_file(
         task_id="users_json_files_bigquery",
-        input_file=File(path="gs://owshq-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
-        output_table=Table(name="users", metadata=Metadata(schema="OwsHQ"), conn_id=BIGQUERY_CONN_ID),
+        input_file=File(path="gs://crs-landing-zone/users", filetype=FileType.JSON, conn_id=SOURCE_CONN_ID),
+        output_table=Table(name="users", metadata=Metadata(schema="CrsHQ"), conn_id=BIGQUERY_CONN_ID),
         if_exists="replace",
         use_native_support=True,
         columns_names_capitalization="original"
     )
 
     # define sequence
-    init >> [users_json_files_snowflake, users_json_files_bigquery] >> finish
+    init >> [users_json_files_postgres, users_json_files_bigquery] >> finish
 
 # init
 dag = load_files_warehouse()
