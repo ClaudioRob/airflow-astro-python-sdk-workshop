@@ -6,3 +6,6 @@ astronomer-providers==1.15.2
 
 # https://pypi.org/project/minio/
 minio==7.1.14
+
+# Google providers
+apache-airflow-providers-google==10.13.1
