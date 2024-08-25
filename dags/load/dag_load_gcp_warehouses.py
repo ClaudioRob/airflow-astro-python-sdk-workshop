@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from airflow.decorators import dag, task
 from airflow.operators.empty import EmptyOperator
 
+
 from astro import sql as aql
 from astro.files import File
 from astro.constants import FileType
@@ -28,8 +29,8 @@ default_args = {
 
 # declare dag
 @dag(
-    dag_id="dag_load_gcp_bigquery",
-    start_date=datetime(2024, 8, 20),       # data inicial da execução
+    dag_id="dag_load_gcp_warehouses",
+    start_date=datetime(2024, 8, 8),       # data inicial da execução
     schedule_interval=timedelta(hours=24),  # intervalo de execução
     max_active_runs=1,                      # evitar nova execuçao caso esteja ativa
     catchup=False,                          # evitar que sejam reprocessados arquivos antigos
