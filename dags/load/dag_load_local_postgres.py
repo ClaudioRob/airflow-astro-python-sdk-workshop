@@ -45,9 +45,8 @@ def dataframe_etl():
     # load files {user}
     user_file = aql.load_file(
         task_id="user_file",
-        input_file=File(path=str(CWD.parent) + "/dags/data/user/user*", filetype=FileType.JSON),
+        input_file=File("/usr/local/airflow/airflow-astro-python-sdk-workshop/dags/data/user/user_2023_2_28_23_30_28.json", filetype=FileType.JSON),
         output_table=Table(name="user", conn_id=POSTGRESS_CONN_ID, metadata=Metadata(schema="astro"),),
-        # output_table=Table(metadata=Metadata(schema=schema), name="user", conn_id="postgres_conn"),
         if_exists="replace",
         use_native_support=True,
         columns_names_capitalization="original"     
@@ -65,7 +64,6 @@ def dataframe_etl():
 
     # define sequence
     init_data_load >> [user_file, subscription_file] >> finish_data_load
-
 
 # init dag
 dag = dataframe_etl()

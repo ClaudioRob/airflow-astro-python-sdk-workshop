@@ -9,8 +9,8 @@ from astro.sql.table import Table, Metadata
 import os
 
 # Substitua pelos seus IDs de conexão
-ASTRO_S3_CONN_ID = 'aws_default'
-ASTRO_POSTGRES_CONN_ID = 'postgres_conn'
+MINIO_CONN_ID = 'aws_default'
+POSTGRES_CONN_ID = 'postgres_conn'
 
 # Definição da DAG usando o Astro SDK
 @dag(
@@ -26,13 +26,13 @@ def load_csv_to_postgres():
     # Definindo a origem do arquivo no MinIO (S3)
     minio_file = File(
         path="s3://airflow/resultados3km.csv",
-        conn_id="aws_default"  # Este é o ID da conexão S3 configurado no Airflow
+        conn_id=MINIO_CONN_ID  # Este é o ID da conexão S3 configurado no Airflow
     )
     
     # Definindo a tabela de destino no PostgreSQL
     postgres_table = Table(
         name="resultados",
-        conn_id="postgres_conn",  # Este é o ID da conexão PostgreSQL configurado no Airflow
+        conn_id=POSTGRES_CONN_ID,  # Este é o ID da conexão PostgreSQL configurado no Airflow
         metadata=Metadata(schema="corridas")
     )
     
