@@ -1,15 +1,15 @@
-import os
+from airflow.operators.python_operator import PythonOperator
 
-path_pattern = '/usr/local/airflow/dags/dags/data/user/user*'
-path = path_pattern.rstrip('*')  # Remove o '*' para verificar o diretório base
+def check_file_exists(**kwargs):
+    path_pattern = kwargs.get('path_pattern')
+    if os.path.exists(path_pattern):
+        print("Arquivo encontrado.")
+    else:
+        print("Arquivo não encontrado.")
 
-print(f"Verificando no diretório: {path}")
-
-# Listar arquivos no diretório base
-files = os.listdir(path)
-print(f"Arquivos encontrados: {files}")
-
-# Verificar se o padrão de arquivo existe
-import glob
-matched_files = glob.glob(path_pattern)
-print(f"Arquivos que correspondem ao padrão: {matched_files}")
+check_file_task = PythonOperator(
+    task_id='check_file',
+    python_callable=check_file_exists,
+    op_kwargs={'path_pattern': 'airflow-astro-python-sdk-workshop/dags/data/user/user_2023_2_28_23_30_28.json'},
+    dag=dag,
+)
